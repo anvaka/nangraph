@@ -6,5 +6,9 @@ test('it can get count', function(t) {
   var count = graph.getNodesCount();
   t.equals(count, 0, 'no nodes');
 
+  graph.addNode('anvaka');
+  count = graph.getNodesCount();
+  t.equals(count, 1, 'one added');
+
   t.end();
 });

@@ -5,6 +5,7 @@
       "sources": [
         "src/index.cc",
         "src/NanGraph.cc",
+        "src/NanGraphUtils.cc",
         "src/Graph.cc"
       ],
       "include_dirs": [

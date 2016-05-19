@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <set>
 
+
 /**
  * This is our core graph structure. I'm trying to optimize for RAM and speed.
  *
@@ -15,7 +16,8 @@
  * Node removal time: O(m * lg(m)), where m is a max degree of adjacent nodes.
  */
 class Graph {
-private:
+
+public:
   class Node {
     private:
       // these sets store all outgoing and incoming edges for a given node.
@@ -29,13 +31,18 @@ private:
     friend class Graph;
   };
 
+private:
   std::unordered_map<int, Node> _nodes;
+  std::unordered_map<int, const std::string *> _idToData;
 
 public:
   Graph();
   ~Graph();
 
+  int addNode(const int& id, const std::string *data);
+
   int getNodesCount() { return _nodes.size(); }
+  Graph::Node* getNode(const int& id);
 };
 
 #endif

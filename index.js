@@ -9,12 +9,20 @@ function createGraph() {
   var graph = new NativeGraph();
 
   var api = {
-    getNodesCount: getNodesCount
+    getNodesCount: getNodesCount,
+    addNode: addNode
   };
 
   return api;
 
   function getNodesCount() {
     return graph.getNodesCount();
+  }
+
+  function addNode(id, data) {
+    if (id === undefined) {
+      throw new Error('Node id cannot be undefined');
+    }
+    graph.addNode(id, data);
   }
 }
