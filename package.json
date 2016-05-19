@@ -1,0 +1,21 @@
+{
+  "name": "nangraph",
+  "version": "0.1.0",
+  "description": "Experimental graph library with native C++ bindings",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "ngraph",
+    "experiment",
+    "c++",
+    "native"
+  ],
+  "author": "Andrei Kashcha",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anvaka/nangraph"
+  }
+}
