@@ -33,15 +33,14 @@ public:
 
 private:
   std::unordered_map<int, Node> _nodes;
-  std::unordered_map<int, const std::string *> _idToData;
 
 public:
   Graph();
   ~Graph();
 
-  int addNode(const int& id, const std::string *data);
-
+  int addNode(const int& id);
   int getNodesCount() { return _nodes.size(); }
+  
   Graph::Node* getNode(const int& id);
 };
 

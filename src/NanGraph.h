@@ -15,6 +15,8 @@ class NanGraph : public Nan::ObjectWrap {
 
  private:
   std::unique_ptr<Graph> _graph;
+  std::unordered_map<int, Nan::Persistent<v8::Value>> _nodeData;
+
   IdManager _idManager;
 
   explicit NanGraph();
@@ -33,10 +35,23 @@ class NanGraph : public Nan::ObjectWrap {
    * Adds a new node. Take one or two arguments on JS side.
    *
    * @param {string} nodeId - identifier of the the node.
-   * @param {string} data - any contextual data associated with the node.
+   * @param {any} data - any contextual data associated with the node.
    */
   static NAN_METHOD(AddNode);
 
+  /**
+   * Gets a node by given id.
+   *
+   * @param {string} nodeId - identifier of the the node.
+   * @returns {object} with two fields:
+   *   `id` - node identifier (always a string)
+   *   `data` - only present when node was added with `data` attribute. This
+   *   is exactly the same object as it was passed to `addNode()`
+   */
+  static NAN_METHOD(GetNode);
+
+  void _saveData(int nodeId, const v8::Local<v8::Value>& arg);
+  int _getDataIndex(const int& nodeId);
 };
 
 #endif

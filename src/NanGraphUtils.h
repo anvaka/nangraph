@@ -17,18 +17,24 @@ std::string v8toString(const v8::Local<v8::Value>& arg);
  * bad memory profile.
  */
 class IdManager {
-  private:
-    int _lastAvailableId = 0;
-    std::unordered_map<std::string, int> _memory;
+private:
+  int _lastAvailableId = 0;
+  std::unordered_map<std::string, int> _memory;
 
-  public:
-    IdManager();
-    ~IdManager();
+public:
+  IdManager();
+  ~IdManager();
 
-    /**
-     * Gets graph id for a given user space id (string)
-     */
-    int getAndRemember(const std::string &id);
+  /**
+  * Gets graph id for a given user space id (string)
+  */
+  int getAndRemember(const std::string &id);
+  
+  /**
+   gets integer id but does not remember anything. If no such node exist
+   negative value is returned
+   */
+  int get(const std::string &id);
 };
 
 #endif

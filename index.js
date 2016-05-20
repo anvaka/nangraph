@@ -10,7 +10,8 @@ function createGraph() {
 
   var api = {
     getNodesCount: getNodesCount,
-    addNode: addNode
+    addNode: addNode,
+    getNode: getNode
   };
 
   return api;
@@ -24,5 +25,9 @@ function createGraph() {
       throw new Error('Node id cannot be undefined');
     }
     graph.addNode(id, data);
+  }
+
+  function getNode(id) {
+    return graph.getNode(id);
   }
 }

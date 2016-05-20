@@ -3,13 +3,11 @@
 Graph::Graph() {}
 Graph::~Graph() {}
 
-int Graph::addNode(const int& id, const std::string* data) {
+int Graph::addNode(const int& id) {
   auto node = getNode(id);
   if (node == nullptr) {
     _nodes[id] = Node();
   }
-
-  if (data != nullptr) _idToData[id] = data;
 
   return id;
 }
