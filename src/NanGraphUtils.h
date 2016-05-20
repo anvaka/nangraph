@@ -19,6 +19,7 @@ std::string v8toString(const v8::Local<v8::Value>& arg);
 class IdManager {
 private:
   int _lastAvailableId = 0;
+  // TODO: Should this be just a hash?
   std::unordered_map<std::string, int> _memory;
 
 public:
