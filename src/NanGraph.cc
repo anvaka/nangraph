@@ -90,16 +90,16 @@ NAN_METHOD(NanGraph::GetNode) {
   info.GetReturnValue().Set(node);
 }
 
-v8::Local<v8::Value> NanGraph::getJSNodeByInternalId(v8::Isolate* isolate, const int& internalId) {
+v8::Local<v8::Value> NanGraph::getJSNodeByInternalId(v8::Isolate* isolate, const std::size_t& internalId) {
   auto nodeIdStrPtr = _idManager.getStringPtrFromHash(internalId);
   if (nodeIdStrPtr == nullptr) {
     return Nan::Undefined();
   }
-  
+
   return _makeNode(isolate, *nodeIdStrPtr, internalId);
 }
 
-v8::Local<v8::Value> NanGraph::_makeNode(v8::Isolate* isolate, const std::string& nodeIdStr, const int& nodeId) {
+v8::Local<v8::Value> NanGraph::_makeNode(v8::Isolate* isolate, const std::string& nodeIdStr, const std::size_t& nodeId) {
   auto node = Nan::New<v8::Object>();
   Nan::Set(node, Nan::New("id").ToLocalChecked(), Nan::New(nodeIdStr).ToLocalChecked());
 
@@ -108,14 +108,14 @@ v8::Local<v8::Value> NanGraph::_makeNode(v8::Isolate* isolate, const std::string
     auto data = _nodeData[nodeId].Get(isolate);
     Nan::Set(node, Nan::New("data").ToLocalChecked(), data);
   }
-  
+
   return node;
 }
 
 
 NAN_METHOD(NanGraph::AddLink) {
   NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
-  
+
   auto fromIdIdStr = v8toString(info[0]);
   auto fromId = self->_idManager.getAndRemember(fromIdIdStr);
 
@@ -123,7 +123,7 @@ NAN_METHOD(NanGraph::AddLink) {
   auto toId = self->_idManager.getAndRemember(toIdIdStr);
 
   auto linkId = self->_graph->addLink(fromId, toId);
-  
+
   if (info.Length() > 2 && !info[2]->IsUndefined()) {
     // todo: undefined deletes?
     self->_saveLinkData(linkId, info[2]);
@@ -132,21 +132,21 @@ NAN_METHOD(NanGraph::AddLink) {
 
 NAN_METHOD(NanGraph::GetLink) {
   NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
-  
+
   auto fromIdIdStr = v8toString(info[0]);
   auto fromId = self->_idManager.getHashPtrFromString(fromIdIdStr);
   if (fromId == nullptr) return;
-  
+
   auto toIdIdStr = v8toString(info[1]);
   auto toId = self->_idManager.getHashPtrFromString(toIdIdStr);
   if (toId == nullptr) return;
 
   if (!self->_graph->hasLink(*fromId, *toId)) return;
-  
+
   v8::Local<v8::Object> link = Nan::New<v8::Object>();
   Nan::Set(link, Nan::New("fromId").ToLocalChecked(), info[0]);
   Nan::Set(link, Nan::New("toId").ToLocalChecked(), info[1]);
-  
+
   auto linkId = self->_graph->getLinkId(*fromId, *toId);
   if (self->_hasDataId(self->_linkData, linkId)) {
     // link has data, add it:
@@ -159,11 +159,11 @@ NAN_METHOD(NanGraph::GetLink) {
 
 NAN_METHOD(NanGraph::ForEachNode) {
   NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
-  
+
   auto callback = info[0].As<v8::Function>();
-  
+
   Forwarder forwardNode(self, info.GetIsolate(), callback);
-  
+
   auto visitor = std::bind(
                            &Forwarder::ForwardNodeResults,
                            &forwardNode,
@@ -174,15 +174,15 @@ NAN_METHOD(NanGraph::ForEachNode) {
 
 }
 
-void NanGraph::_saveLinkData(int linkId, const v8::Local<v8::Value>& arg) {
+void NanGraph::_saveLinkData(std::size_t linkId, const v8::Local<v8::Value>& arg) {
     _linkData[linkId].Reset(arg);
 }
 
-void NanGraph::_saveData(int nodeId, const v8::Local<v8::Value>& arg) {
+void NanGraph::_saveData(std::size_t nodeId, const v8::Local<v8::Value>& arg) {
     _nodeData[nodeId].Reset(arg);
 }
 
-bool NanGraph::_hasDataId(const JSDataStorage& storage, const int& id) {
+bool NanGraph::_hasDataId(const JSDataStorage& storage, const std::size_t& id) {
   auto search = storage.find(id);
   return search != storage.end();
 }

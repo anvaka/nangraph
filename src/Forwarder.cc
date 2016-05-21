@@ -1,6 +1,6 @@
 #include "Forwarder.h"
 
-bool Forwarder::ForwardNodeResults(const int &nodeId, const Node *node) {
+bool Forwarder::ForwardNodeResults(const std::size_t &nodeId, const Node *node) {
   const unsigned argc = 1;
   auto ctx = Nan::GetCurrentContext();
 

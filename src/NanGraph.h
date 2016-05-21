@@ -6,7 +6,7 @@
 #include "NanGraphUtils.h"
 #include "Forwarder.h"
 
-typedef std::unordered_map<int, Nan::Persistent<v8::Value>> JSDataStorage;
+typedef std::unordered_map<std::size_t, Nan::Persistent<v8::Value>> JSDataStorage;
 
 /**
  * This class provides v8 bindings to native Graph
@@ -85,11 +85,11 @@ class NanGraph : public Nan::ObjectWrap {
    */
   static NAN_METHOD(GetLink);
   
-  void _saveData(int nodeId, const v8::Local<v8::Value>& arg);
-  void _saveLinkData(int linkId, const v8::Local<v8::Value>& arg);
-  bool _hasDataId(const JSDataStorage& storage, const int& id);
-  v8::Local<v8::Value> _makeNode(v8::Isolate* isolate, const std::string& nodeIdStr, const int& nodeId);
-  v8::Local<v8::Value> getJSNodeByInternalId(v8::Isolate* isolate, const int& internalId);
+  void _saveData(std::size_t nodeId, const v8::Local<v8::Value>& arg);
+  void _saveLinkData(std::size_t linkId, const v8::Local<v8::Value>& arg);
+  bool _hasDataId(const JSDataStorage& storage, const std::size_t& id);
+  v8::Local<v8::Value> _makeNode(v8::Isolate* isolate, const std::string& nodeIdStr, const std::size_t& nodeId);
+  v8::Local<v8::Value> getJSNodeByInternalId(v8::Isolate* isolate, const std::size_t& internalId);
 };
 
 #endif

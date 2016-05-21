@@ -8,7 +8,7 @@ Graph::~Graph() {
   }
 }
 
-Node* Graph::addNode(const int& id) {
+Node* Graph::addNode(const std::size_t& id) {
   auto node = getNode(id);
   if (node == nullptr) {
     node = new Node();
@@ -18,7 +18,7 @@ Node* Graph::addNode(const int& id) {
   return node;
 }
 
-Node* Graph::getNode(const int& id) {
+Node* Graph::getNode(const std::size_t& id) {
   auto iter = _nodes.find(id);
   if (iter == _nodes.end()) {
     return nullptr;
@@ -36,7 +36,7 @@ bool Graph::forEachNode(NodeCallback callback) {
   return false;
 }
 
-int Graph::addLink(const int& fromId, const int &toId) {
+std::size_t Graph::addLink(const std::size_t& fromId, const std::size_t &toId) {
   auto fromNode = addNode(fromId);
   auto toNode = addNode(toId);
 
@@ -47,14 +47,14 @@ int Graph::addLink(const int& fromId, const int &toId) {
   return getLinkId(fromId, toId);
 }
 
-int Graph::getLinkId(const int& fromId, const int &toId) {
-  int seed = 0;
+std::size_t Graph::getLinkId(const std::size_t& fromId, const std::size_t &toId) {
+  std::size_t seed = 0;
   seed ^= fromId + 0x9e3779b9 + (seed << 6) + (seed >> 2);
   seed ^= toId + 0x9e3779b9 + (seed << 6) + (seed >> 2);
   return seed;
 }
 
-bool Graph::hasLink(const int& fromId, const int &toId) {
+bool Graph::hasLink(const std::size_t& fromId, const std::size_t &toId) {
   auto fromNode = getNode(fromId);
   if (fromNode == nullptr) return false;
   

@@ -1,4 +1,5 @@
 #include "NanGraphUtils.h"
+#include <iostream>
 
 std::string v8toString(const v8::Local<v8::Value>& arg) {
   v8::String::Utf8Value param(arg->ToString());
@@ -9,13 +10,18 @@ std::string v8toString(const v8::Local<v8::Value>& arg) {
 IdManager::IdManager() {}
 IdManager::~IdManager() {}
 
-int IdManager::getAndRemember(const std::string& stringId) {
+std::size_t IdManager::getAndRemember(const std::string& stringId) {
   auto id = _hasher(stringId);
+  auto search = _memory.find(id);
+  if (search != _memory.end()) {
+    std::cout << "Collision detected for: " << stringId << " hashed into " << id << std::endl
+    << "This has was also generated for: " << search->second << std::endl;
+  }
   _memory[id] = stringId;
   return id;
 }
 
-const int* IdManager::getHashPtrFromString(const std::string &stringId) {
+const std::size_t* IdManager::getHashPtrFromString(const std::string &stringId) {
   auto id = _hasher(stringId);
   auto search = _memory.find(id);
   if (search == _memory.end()) {
@@ -25,7 +31,7 @@ const int* IdManager::getHashPtrFromString(const std::string &stringId) {
   return &(search->first);
 }
 
-const std::string* IdManager::getStringPtrFromHash(const int &hash) {
+const std::string* IdManager::getStringPtrFromHash(const std::size_t &hash) {
   auto search = _memory.find(hash);
   if (search == _memory.end()) {
     return nullptr;
