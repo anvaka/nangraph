@@ -5,6 +5,8 @@
 #include "Graph.h"
 #include "NanGraphUtils.h"
 
+typedef std::unordered_map<int, Nan::Persistent<v8::Value>> JSDataStorage;
+
 /**
  * This class provides v8 bindings to native Graph
  */
@@ -15,7 +17,9 @@ class NanGraph : public Nan::ObjectWrap {
 
  private:
   std::unique_ptr<Graph> _graph;
-  std::unordered_map<int, Nan::Persistent<v8::Value>> _nodeData;
+  JSDataStorage _nodeData;
+  JSDataStorage _linkData;
+
 
   IdManager _idManager;
 
@@ -50,8 +54,26 @@ class NanGraph : public Nan::ObjectWrap {
    */
   static NAN_METHOD(GetNode);
 
+  /**
+   * Adds a new link (edge) to the the graph
+   *
+   * @param {string} fromId - identifier of the edge start
+   * @param {string} toId - identifier of the edge end
+   */
+  static NAN_METHOD(AddLink);
+
+  /**
+   * Given from and to node ids, returns a link and associated data (if any);
+   * If no link is found, returns undefined.
+   *
+   * @param {string} fromId - identifier of the edge start
+   * @param {string} toId - identifier of the edge end
+   */
+  static NAN_METHOD(GetLink);
+  
   void _saveData(int nodeId, const v8::Local<v8::Value>& arg);
-  int _getDataIndex(const int& nodeId);
+  void _saveLinkData(int linkId, const v8::Local<v8::Value>& arg);
+  int _getDataIndex(const JSDataStorage& storage, const int& nodeId);
 };
 
 #endif

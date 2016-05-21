@@ -32,16 +32,21 @@ public:
   };
 
 private:
-  std::unordered_map<int, Node> _nodes;
+  std::unordered_map<int, Node*> _nodes;
 
 public:
   Graph();
   ~Graph();
 
-  int addNode(const int& id);
-  int getNodesCount() { return _nodes.size(); }
-  
+  Graph::Node* addNode(const int& id);
   Graph::Node* getNode(const int& id);
+  
+  int addLink(const int& fromId, const int &toId);
+  int getLinkId(const int& fromId, const int &toId);
+  
+  bool hasLink(const int& fromId, const int &toId);
+  int getNodesCount() { return _nodes.size(); }
+
 };
 
 #endif

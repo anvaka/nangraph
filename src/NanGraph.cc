@@ -5,7 +5,13 @@ NanGraph::NanGraph() {
 };
 
 NanGraph::~NanGraph() {
-  // TODO: Should I reset all Persistent<> data?
+  // release all persistent objects
+  for (auto &i : _nodeData) {
+    i.second.Reset();
+  }
+  for (auto &i : _linkData) {
+    i.second.Reset();
+  }
 };
 
 Nan::Persistent<v8::Function> NanGraph::constructor;
@@ -20,6 +26,8 @@ NAN_MODULE_INIT(NanGraph::Init) {
   Nan::SetPrototypeMethod(tpl, "getNodesCount", GetNodesCount);
   Nan::SetPrototypeMethod(tpl, "addNode", AddNode);
   Nan::SetPrototypeMethod(tpl, "getNode", GetNode);
+  Nan::SetPrototypeMethod(tpl, "addLink", AddLink);
+  Nan::SetPrototypeMethod(tpl, "getLink", GetLink);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("Graph").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -72,7 +80,7 @@ NAN_METHOD(NanGraph::GetNode) {
   Nan::Set(node, Nan::New("id").ToLocalChecked(), Nan::New(nodeIdStr).ToLocalChecked());
 
   // append data if we have any
-  auto dataIndex = self->_getDataIndex(nodeId);
+  auto dataIndex = self->_getDataIndex(self->_nodeData, nodeId);
   if (dataIndex >= 0) {
     auto data = self->_nodeData[nodeId].Get(info.GetIsolate());
     Nan::Set(node, Nan::New("data").ToLocalChecked(), data);
@@ -81,12 +89,62 @@ NAN_METHOD(NanGraph::GetNode) {
   info.GetReturnValue().Set(node);
 }
 
+NAN_METHOD(NanGraph::AddLink) {
+  NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
+  
+  auto fromIdIdStr = v8toString(info[0]);
+  auto fromId = self->_idManager.getAndRemember(fromIdIdStr);
+
+  auto toIdIdStr = v8toString(info[1]);
+  auto toId = self->_idManager.getAndRemember(toIdIdStr);
+
+  auto linkId = self->_graph->addLink(fromId, toId);
+  
+  if (info.Length() > 2 && !info[2]->IsUndefined()) {
+    // todo: undefined deletes?
+    self->_saveLinkData(linkId, info[2]);
+  }
+}
+
+NAN_METHOD(NanGraph::GetLink) {
+  NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
+  
+  auto fromIdIdStr = v8toString(info[0]);
+  auto fromId = self->_idManager.get(fromIdIdStr);
+  if (fromId < 0) return;
+  
+  auto toIdIdStr = v8toString(info[1]);
+  auto toId = self->_idManager.get(toIdIdStr);
+  if (toId < 0) return;
+
+  if (!self->_graph->hasLink(fromId, toId)) return;
+  
+  v8::Local<v8::Object> link = Nan::New<v8::Object>();
+  Nan::Set(link, Nan::New("fromId").ToLocalChecked(), info[0]);
+  Nan::Set(link, Nan::New("toId").ToLocalChecked(), info[1]);
+  
+  auto linkId = self->_graph->getLinkId(fromId, toId);
+  auto dataIndex = self->_getDataIndex(self->_linkData, linkId);
+  if (dataIndex >= 0) {
+    // link has data, add it:
+    auto data = self->_linkData[linkId].Get(info.GetIsolate());
+    Nan::Set(link, Nan::New("data").ToLocalChecked(), data);
+  }
+
+  info.GetReturnValue().Set(link);
+}
+
+
+void NanGraph::_saveLinkData(int linkId, const v8::Local<v8::Value>& arg) {
+    _linkData[linkId].Reset(arg);
+}
+
 void NanGraph::_saveData(int nodeId, const v8::Local<v8::Value>& arg) {
     _nodeData[nodeId].Reset(arg);
 }
 
-int NanGraph::_getDataIndex(const int& nodeId) {
-  auto search = _nodeData.find(nodeId);
-  if (search == _nodeData.end()) return -1;
+int NanGraph::_getDataIndex(const JSDataStorage& storage, const int& nodeId) {
+  auto search = storage.find(nodeId);
+  if (search == storage.end()) return -1;
   return nodeId;
 }

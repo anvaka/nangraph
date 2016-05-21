@@ -11,7 +11,10 @@ function createGraph() {
   var api = {
     getNodesCount: getNodesCount,
     addNode: addNode,
-    getNode: getNode
+    getNode: getNode,
+    addLink: addLink,
+    getLink: getLink,
+    hasLink: getLink
   };
 
   return api;
@@ -29,5 +32,13 @@ function createGraph() {
 
   function getNode(id) {
     return graph.getNode(id);
+  }
+
+  function getLink(fromId, toId) {
+    return graph.getLink(fromId, toId);
+  }
+
+  function addLink(fromId, toId, data) {
+    return graph.addLink(fromId, toId, data);
   }
 }
