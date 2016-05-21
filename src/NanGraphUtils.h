@@ -18,24 +18,31 @@ std::string v8toString(const v8::Local<v8::Value>& arg);
  */
 class IdManager {
 private:
-  int _lastAvailableId = 0;
-  // TODO: Should this be just a hash?
-  std::unordered_map<std::string, int> _memory;
+  // We keep map of "hash(string) to string" so that clients
+  // with hash value could get actual strings later.
+  std::unordered_map<int, std::string> _memory;
+  
+  // This is the hasher that will give us ids for each string.
+  std::hash<std::string> _hasher;
 
 public:
   IdManager();
   ~IdManager();
 
   /**
-  * Gets graph id for a given user space id (string)
-  */
+   * Gets graph id for a given user space id (string). Remembers mapping into
+   * internal storage.
+   * The graph id is equal to hash(stringId).
+   */
   int getAndRemember(const std::string &id);
   
   /**
-   gets integer id but does not remember anything. If no such node exist
-   negative value is returned
+   * Returns pointer to id if we've seen given string. Returns
+   * nullptr otherwise.
    */
-  int get(const std::string &id);
+  const int* getHashPtrFromString(const std::string &id);
+  
+  const std::string* getStringPtrFromHash(const int &hash);
 };
 
 #endif

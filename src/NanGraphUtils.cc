@@ -6,27 +6,29 @@ std::string v8toString(const v8::Local<v8::Value>& arg) {
   return std::string(*param);
 }
 
-
 IdManager::IdManager() {}
 IdManager::~IdManager() {}
 
 int IdManager::getAndRemember(const std::string& stringId) {
-  auto id = get(stringId);
-
-  if(id < 0) {
-    _memory[stringId] = _lastAvailableId;
-    _lastAvailableId++;
-    return _memory[stringId];
-  }
-
+  auto id = _hasher(stringId);
+  _memory[id] = stringId;
   return id;
 }
 
-int IdManager::get(const std::string &id) {
+const int* IdManager::getHashPtrFromString(const std::string &stringId) {
+  auto id = _hasher(stringId);
   auto search = _memory.find(id);
   if (search == _memory.end()) {
-    return -1;
+    return nullptr;
   }
   
-  return search->second;
+  return &(search->first);
+}
+
+const std::string* IdManager::getStringPtrFromHash(const int &hash) {
+  auto search = _memory.find(hash);
+  if (search == _memory.end()) {
+    return nullptr;
+  }
+  return &(search->second);
 }

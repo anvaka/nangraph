@@ -24,10 +24,12 @@ NAN_MODULE_INIT(NanGraph::Init) {
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
   Nan::SetPrototypeMethod(tpl, "getNodesCount", GetNodesCount);
+  Nan::SetPrototypeMethod(tpl, "getLinksCount", GetLinksCount);
   Nan::SetPrototypeMethod(tpl, "addNode", AddNode);
   Nan::SetPrototypeMethod(tpl, "getNode", GetNode);
   Nan::SetPrototypeMethod(tpl, "addLink", AddLink);
   Nan::SetPrototypeMethod(tpl, "getLink", GetLink);
+  Nan::SetPrototypeMethod(tpl, "forEachNode", ForEachNode);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("Graph").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -47,6 +49,12 @@ NAN_METHOD(NanGraph::New) {
 
     info.GetReturnValue().Set(instance);
   }
+}
+
+NAN_METHOD(NanGraph::GetLinksCount) {
+  NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
+  auto result = self->_graph->getLinksCount();
+  info.GetReturnValue().Set(result);
 }
 
 NAN_METHOD(NanGraph::GetNodesCount) {
@@ -71,23 +79,39 @@ NAN_METHOD(NanGraph::AddNode) {
 NAN_METHOD(NanGraph::GetNode) {
   NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
   auto nodeIdStr = v8toString(info[0]);
-  auto nodeId = self->_idManager.get(nodeIdStr);
-  if (nodeId < 0) {
+
+  auto nodeIdPtr = self->_idManager.getHashPtrFromString(nodeIdStr);
+  if (nodeIdPtr == nullptr) {
     return; // no such node.
   }
 
-  v8::Local<v8::Object> node = Nan::New<v8::Object>();
-  Nan::Set(node, Nan::New("id").ToLocalChecked(), Nan::New(nodeIdStr).ToLocalChecked());
-
-  // append data if we have any
-  auto dataIndex = self->_getDataIndex(self->_nodeData, nodeId);
-  if (dataIndex >= 0) {
-    auto data = self->_nodeData[nodeId].Get(info.GetIsolate());
-    Nan::Set(node, Nan::New("data").ToLocalChecked(), data);
-  }
+  auto node = self->_makeNode(info.GetIsolate(), nodeIdStr, *nodeIdPtr);
 
   info.GetReturnValue().Set(node);
 }
+
+v8::Local<v8::Value> NanGraph::getJSNodeByInternalId(v8::Isolate* isolate, const int& internalId) {
+  auto nodeIdStrPtr = _idManager.getStringPtrFromHash(internalId);
+  if (nodeIdStrPtr == nullptr) {
+    return Nan::Undefined();
+  }
+  
+  return _makeNode(isolate, *nodeIdStrPtr, internalId);
+}
+
+v8::Local<v8::Value> NanGraph::_makeNode(v8::Isolate* isolate, const std::string& nodeIdStr, const int& nodeId) {
+  auto node = Nan::New<v8::Object>();
+  Nan::Set(node, Nan::New("id").ToLocalChecked(), Nan::New(nodeIdStr).ToLocalChecked());
+
+  // append data if we have any...
+  if (_hasDataId(_nodeData, nodeId)) {
+    auto data = _nodeData[nodeId].Get(isolate);
+    Nan::Set(node, Nan::New("data").ToLocalChecked(), data);
+  }
+  
+  return node;
+}
+
 
 NAN_METHOD(NanGraph::AddLink) {
   NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
@@ -110,22 +134,21 @@ NAN_METHOD(NanGraph::GetLink) {
   NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
   
   auto fromIdIdStr = v8toString(info[0]);
-  auto fromId = self->_idManager.get(fromIdIdStr);
-  if (fromId < 0) return;
+  auto fromId = self->_idManager.getHashPtrFromString(fromIdIdStr);
+  if (fromId == nullptr) return;
   
   auto toIdIdStr = v8toString(info[1]);
-  auto toId = self->_idManager.get(toIdIdStr);
-  if (toId < 0) return;
+  auto toId = self->_idManager.getHashPtrFromString(toIdIdStr);
+  if (toId == nullptr) return;
 
-  if (!self->_graph->hasLink(fromId, toId)) return;
+  if (!self->_graph->hasLink(*fromId, *toId)) return;
   
   v8::Local<v8::Object> link = Nan::New<v8::Object>();
   Nan::Set(link, Nan::New("fromId").ToLocalChecked(), info[0]);
   Nan::Set(link, Nan::New("toId").ToLocalChecked(), info[1]);
   
-  auto linkId = self->_graph->getLinkId(fromId, toId);
-  auto dataIndex = self->_getDataIndex(self->_linkData, linkId);
-  if (dataIndex >= 0) {
+  auto linkId = self->_graph->getLinkId(*fromId, *toId);
+  if (self->_hasDataId(self->_linkData, linkId)) {
     // link has data, add it:
     auto data = self->_linkData[linkId].Get(info.GetIsolate());
     Nan::Set(link, Nan::New("data").ToLocalChecked(), data);
@@ -134,6 +157,22 @@ NAN_METHOD(NanGraph::GetLink) {
   info.GetReturnValue().Set(link);
 }
 
+NAN_METHOD(NanGraph::ForEachNode) {
+  NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
+  
+  auto callback = info[0].As<v8::Function>();
+  
+  Forwarder forwardNode(self, info.GetIsolate(), callback);
+  
+  auto visitor = std::bind(
+                           &Forwarder::ForwardNodeResults,
+                           &forwardNode,
+                           std::placeholders::_1,
+                           std::placeholders::_2);
+
+  self->_graph->forEachNode(visitor);
+
+}
 
 void NanGraph::_saveLinkData(int linkId, const v8::Local<v8::Value>& arg) {
     _linkData[linkId].Reset(arg);
@@ -143,8 +182,7 @@ void NanGraph::_saveData(int nodeId, const v8::Local<v8::Value>& arg) {
     _nodeData[nodeId].Reset(arg);
 }
 
-int NanGraph::_getDataIndex(const JSDataStorage& storage, const int& nodeId) {
-  auto search = storage.find(nodeId);
-  if (search == storage.end()) return -1;
-  return nodeId;
+bool NanGraph::_hasDataId(const JSDataStorage& storage, const int& id) {
+  auto search = storage.find(id);
+  return search != storage.end();
 }

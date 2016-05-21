@@ -5,8 +5,13 @@
       "sources": [
         "src/index.cc",
         "src/NanGraph.cc",
+        "src/NanGraph.h",
         "src/NanGraphUtils.cc",
-        "src/Graph.cc"
+        "src/NanGraphUtils.h",
+        "src/Graph.cc",
+        "src/Graph.h",
+        "src/Forwarder.cc",
+        "src/Forwarder.h",
       ],
       "include_dirs": [
         "<!(node -e \"require('nan')\")"

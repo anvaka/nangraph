@@ -4,6 +4,7 @@
 #include <nan.h>
 #include "Graph.h"
 #include "NanGraphUtils.h"
+#include "Forwarder.h"
 
 typedef std::unordered_map<int, Nan::Persistent<v8::Value>> JSDataStorage;
 
@@ -11,6 +12,7 @@ typedef std::unordered_map<int, Nan::Persistent<v8::Value>> JSDataStorage;
  * This class provides v8 bindings to native Graph
  */
 class NanGraph : public Nan::ObjectWrap {
+  friend struct Forwarder;
 
  public:
   static NAN_MODULE_INIT(Init);
@@ -19,7 +21,6 @@ class NanGraph : public Nan::ObjectWrap {
   std::unique_ptr<Graph> _graph;
   JSDataStorage _nodeData;
   JSDataStorage _linkData;
-
 
   IdManager _idManager;
 
@@ -34,6 +35,11 @@ class NanGraph : public Nan::ObjectWrap {
    * Gets number of nodes in this graph.
    */
   static NAN_METHOD(GetNodesCount);
+  
+  /**
+   * Gets number of edges (links) in this graph.
+   */
+  static NAN_METHOD(GetLinksCount);
 
   /**
    * Adds a new node. Take one or two arguments on JS side.
@@ -42,6 +48,14 @@ class NanGraph : public Nan::ObjectWrap {
    * @param {any} data - any contextual data associated with the node.
    */
   static NAN_METHOD(AddNode);
+  
+  /**
+   * Iterates over each node of a graph and invokes a callback.
+   * 
+   * @param {Function} callback - a callback, which will receive node instance
+   *  {id, data} as its argument.
+   */
+  static NAN_METHOD(ForEachNode);
 
   /**
    * Gets a node by given id.
@@ -73,7 +87,9 @@ class NanGraph : public Nan::ObjectWrap {
   
   void _saveData(int nodeId, const v8::Local<v8::Value>& arg);
   void _saveLinkData(int linkId, const v8::Local<v8::Value>& arg);
-  int _getDataIndex(const JSDataStorage& storage, const int& nodeId);
+  bool _hasDataId(const JSDataStorage& storage, const int& id);
+  v8::Local<v8::Value> _makeNode(v8::Isolate* isolate, const std::string& nodeIdStr, const int& nodeId);
+  v8::Local<v8::Value> getJSNodeByInternalId(v8::Isolate* isolate, const int& internalId);
 };
 
 #endif

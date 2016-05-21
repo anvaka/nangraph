@@ -1,5 +1,5 @@
 /**
- * We provide a high level wrapper here. Probably this will come at extra cost
+ * We provide a high level wrapper here. Very thin.
  */
 module.exports = createGraph;
 
@@ -10,18 +10,16 @@ function createGraph() {
 
   var api = {
     getNodesCount: getNodesCount,
+    getLinksCount: getLinksCount,
     addNode: addNode,
     getNode: getNode,
     addLink: addLink,
     getLink: getLink,
-    hasLink: getLink
+    hasLink: getLink,
+    forEachNode: forEachNode
   };
 
   return api;
-
-  function getNodesCount() {
-    return graph.getNodesCount();
-  }
 
   function addNode(id, data) {
     if (id === undefined) {
@@ -30,15 +28,15 @@ function createGraph() {
     graph.addNode(id, data);
   }
 
-  function getNode(id) {
-    return graph.getNode(id);
-  }
+  function getNodesCount() { return graph.getNodesCount(); }
 
-  function getLink(fromId, toId) {
-    return graph.getLink(fromId, toId);
-  }
+  function getLinksCount() { return graph.getLinksCount(); }
 
-  function addLink(fromId, toId, data) {
-    return graph.addLink(fromId, toId, data);
-  }
+  function getNode(id) { return graph.getNode(id); }
+
+  function getLink(fromId, toId) { return graph.getLink(fromId, toId); }
+
+  function addLink(fromId, toId, data) { return graph.addLink(fromId, toId, data); }
+
+  function forEachNode(cb) { return graph.forEachNode(cb); }
 }

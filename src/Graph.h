@@ -7,6 +7,23 @@
 #include <unordered_map>
 #include <set>
 
+class Graph;
+
+class Node {
+private:
+  // these sets store all outgoing and incoming edges for a given node.
+  // As you see this brings us to the world of oriented graphs. I'm not sure
+  // if I'm going to add non-oriented graphs yet.
+  std::multiset<int> inNodes, outNodes;
+  
+public:
+  Node() : inNodes(), outNodes() {}
+  
+  friend class Graph;
+};
+
+
+typedef std::function<bool(int, Node *)> NodeCallback;
 
 /**
  * This is our core graph structure. I'm trying to optimize for RAM and speed.
@@ -18,35 +35,26 @@
 class Graph {
 
 public:
-  class Node {
-    private:
-      // these sets store all outgoing and incoming edges for a given node.
-      // As you see this brings us to the world of oriented graphs. I'm not sure
-      // if I'm going to add non-oriented graphs yet.
-      std::multiset<int> inNodes, outNodes;
-
-    public:
-      Node() : inNodes(), outNodes() {}
-
-    friend class Graph;
-  };
 
 private:
   std::unordered_map<int, Node*> _nodes;
+  int _linksCount = 0;
 
 public:
   Graph();
   ~Graph();
 
-  Graph::Node* addNode(const int& id);
-  Graph::Node* getNode(const int& id);
+  Node* addNode(const int& id);
+  Node* getNode(const int& id);
   
   int addLink(const int& fromId, const int &toId);
   int getLinkId(const int& fromId, const int &toId);
   
   bool hasLink(const int& fromId, const int &toId);
   int getNodesCount() { return _nodes.size(); }
+  int getLinksCount() { return _linksCount; }
 
+  bool forEachNode(NodeCallback callback);
 };
 
 #endif

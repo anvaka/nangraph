@@ -1,13 +1,14 @@
-        #include "Graph.h"
+#include "Graph.h"
 
 Graph::Graph() {}
+
 Graph::~Graph() {
   for (auto &i : _nodes) {
     delete i.second;
   }
 }
 
-Graph::Node* Graph::addNode(const int& id) {
+Node* Graph::addNode(const int& id) {
   auto node = getNode(id);
   if (node == nullptr) {
     node = new Node();
@@ -17,7 +18,7 @@ Graph::Node* Graph::addNode(const int& id) {
   return node;
 }
 
-Graph::Node* Graph::getNode(const int& id) {
+Node* Graph::getNode(const int& id) {
   auto iter = _nodes.find(id);
   if (iter == _nodes.end()) {
     return nullptr;
@@ -26,12 +27,22 @@ Graph::Node* Graph::getNode(const int& id) {
   return iter->second;
 }
 
+bool Graph::forEachNode(NodeCallback callback) {
+  for (auto &i : _nodes) {
+    auto shouldStop = callback(i.first, i.second);
+    if (shouldStop) return true;
+  }
+  
+  return false;
+}
+
 int Graph::addLink(const int& fromId, const int &toId) {
   auto fromNode = addNode(fromId);
   auto toNode = addNode(toId);
 
   fromNode->outNodes.insert(toId);
   toNode->inNodes.insert(fromId);
+  _linksCount += 1;
   
   return getLinkId(fromId, toId);
 }
