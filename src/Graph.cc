@@ -37,8 +37,10 @@ int Graph::addLink(const int& fromId, const int &toId) {
 }
 
 int Graph::getLinkId(const int& fromId, const int &toId) {
-  // TODO: Should I inline this?
-  return fromId ^ (toId << 1);
+  int seed = 0;
+  seed ^= fromId + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+  seed ^= toId + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+  return seed;
 }
 
 bool Graph::hasLink(const int& fromId, const int &toId) {
