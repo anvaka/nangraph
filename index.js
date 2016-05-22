@@ -65,8 +65,6 @@ function createGraph() {
   }
 
   function forEachLink(cb) {
-    throw "implement me!";
-
     if (typeof cb !== 'function') throw new Error('Callback is expected to be a function');
 
     return graph.forEachLink(cb);

@@ -36,6 +36,18 @@ bool Graph::forEachNode(NodeCallback callback) {
   return false;
 }
 
+bool Graph::forEachLink(LinkCallback callback) {
+  for (auto &node: _nodes) {
+    for(auto &to: node.second->outNodes) {
+      auto linkId = getLinkId(node.first, to);
+      auto shouldStop = callback(node.first, to, linkId);
+      if (shouldStop) return true;
+    }
+  }
+  
+  return false;
+}
+
 bool Graph::forEachLinkedNode(const std::size_t nodeId, bool isOut, NodeLinkCallback callback) {
   auto node = getNode(nodeId);
   if (node == nullptr) return false; // we didn't quit because user wanted.

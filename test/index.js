@@ -183,7 +183,31 @@ test('it can iterate edges with data', function(t) {
   t.equals(calledCount, 1, 'All incoming edges visited');
 
   t.end();
-})
+});
+
+test('it can iterate over all edges', function(t) {
+  var graph = createGraph();
+
+  graph.addLink('anvaka', 'github', { language: 'js' });
+  graph.addLink('anvaka', 'twitter', { language: 'birds' });
+  var calledCount = 0;
+
+  graph.forEachLink(function(link) {
+    calledCount += 1;
+    t.equals(link.fromId, 'anvaka', 'anvaka edge is here');
+    if (link.toId === 'github') {
+      t.equals(link.data.language, 'js', 'github data is here');
+    } else if (link.toId === 'twitter') {
+      t.equals(link.data.language, 'birds', 'twitter data is here');
+    } else {
+      t.fail('Unknown edge: ' + link.toId);
+    }
+  });
+
+  t.equals(calledCount, 2, 'All edges traversed');
+  t.end();
+});
+
 
 function collectGarbage() {
   if (global.gc) {

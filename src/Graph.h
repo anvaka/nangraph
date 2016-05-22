@@ -24,6 +24,7 @@ public:
 
 
 typedef std::function<bool(const std::size_t&)> NodeCallback;
+typedef std::function<bool(const std::size_t&, const std::size_t&, const std::size_t&)> LinkCallback;
 typedef std::function<bool(const std::size_t&, const std::size_t &)> NodeLinkCallback;
 
 /**
@@ -56,6 +57,7 @@ public:
   int getLinksCount() { return _linksCount; }
 
   bool forEachNode(NodeCallback callback);
+  bool forEachLink(LinkCallback callback);
   bool forEachLinkedNode(const std::size_t fromId, bool isOut, NodeLinkCallback callback);
 };
 

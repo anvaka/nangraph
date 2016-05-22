@@ -84,8 +84,32 @@ class NanGraph : public Nan::ObjectWrap {
    * @param {string} toId - identifier of the edge end
    */
   static NAN_METHOD(GetLink);
+  
+  /**
+   * Iterates over each outgoing edge of a node
+   *
+   * @param {string} nodeId where to start iteration
+   * @param {Function(otherNodeid, linkData)} callback that is invoked for each
+   * edge.
+   */
   static NAN_METHOD(ForEachOut);
+
+  /**
+   * Iterates over each incoming edge of a node
+   *
+   * @param {string} nodeId where to start iteration
+   * @param {Function(otherNodeid, linkData)} callback that is invoked for each
+   * edge.
+   */
   static NAN_METHOD(ForEachIn);
+  
+  /**
+   * Iterates over each incoming link in the graph
+   *
+   * @param {Function(link)} callback that is invoked for each
+   * visited link. Eahc link has `fromId`, `toId` and `data`.
+   */
+  static NAN_METHOD(ForEachLink);
 
   void _forEachLinkedNode(Nan::NAN_METHOD_ARGS_TYPE info, bool isOut);
   void _saveData(std::size_t nodeId, const v8::Local<v8::Value>& arg);

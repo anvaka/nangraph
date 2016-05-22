@@ -18,7 +18,8 @@ struct Forwarder {
     _isolate = isolate;
   }
 
-  bool ForwardNodeResults(const std::size_t &nodeId);
+  bool ForwardNode(const std::size_t &nodeId);
   bool ForwardNodeAndLink(const std::size_t &nodeId, const std::size_t &linkId);
+  bool ForwardLink(const std::size_t &fromId, const std::size_t &toId, const std::size_t &linkId);
 };
 #endif /* ifndef FORWARDER_H */

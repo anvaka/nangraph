@@ -29,6 +29,7 @@ NAN_MODULE_INIT(NanGraph::Init) {
   Nan::SetPrototypeMethod(tpl, "getNode", GetNode);
   Nan::SetPrototypeMethod(tpl, "addLink", AddLink);
   Nan::SetPrototypeMethod(tpl, "getLink", GetLink);
+  Nan::SetPrototypeMethod(tpl, "forEachLink", ForEachLink);
   Nan::SetPrototypeMethod(tpl, "forEachNode", ForEachNode);
   Nan::SetPrototypeMethod(tpl, "forEachOut", ForEachOut);
   Nan::SetPrototypeMethod(tpl, "forEachIn", ForEachIn);
@@ -167,7 +168,7 @@ NAN_METHOD(NanGraph::ForEachNode) {
   Forwarder forwardNode(self, info.GetIsolate(), callback);
 
   auto visitor = std::bind(
-                           &Forwarder::ForwardNodeResults,
+                           &Forwarder::ForwardNode,
                            &forwardNode,
                            std::placeholders::_1);
 
@@ -182,6 +183,21 @@ NAN_METHOD(NanGraph::ForEachOut) {
 NAN_METHOD(NanGraph::ForEachIn) {
   NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
   self->_forEachLinkedNode(info, false);
+}
+
+NAN_METHOD(NanGraph::ForEachLink) {
+  NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
+  auto callback = info[0].As<v8::Function>();
+  Forwarder forwardLink(self, info.GetIsolate(), callback);
+
+  auto visitor = std::bind(
+                           &Forwarder::ForwardLink,
+                           &forwardLink,
+                           std::placeholders::_1,
+                           std::placeholders::_2,
+                           std::placeholders::_3);
+  
+  self->_graph->forEachLink(visitor);
 }
 
 void NanGraph::_forEachLinkedNode(Nan::NAN_METHOD_ARGS_TYPE info, bool isOut) {
