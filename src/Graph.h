@@ -23,7 +23,8 @@ public:
 };
 
 
-typedef std::function<bool(std::size_t, Node *)> NodeCallback;
+typedef std::function<bool(const std::size_t&)> NodeCallback;
+typedef std::function<bool(const std::size_t&, const std::size_t &)> NodeLinkCallback;
 
 /**
  * This is our core graph structure. I'm trying to optimize for RAM and speed.
@@ -55,6 +56,7 @@ public:
   int getLinksCount() { return _linksCount; }
 
   bool forEachNode(NodeCallback callback);
+  bool forEachLinkedNode(const std::size_t fromId, bool isOut, NodeLinkCallback callback);
 };
 
 #endif

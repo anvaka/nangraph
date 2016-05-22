@@ -128,6 +128,63 @@ test('forEachNode visits all nodes', function(t) {
   t.end();
 });
 
+test('can get in and out edges', function(t) {
+  var graph = createGraph();
+  graph.addLink('anvaka', 'github');
+  graph.addLink('anvaka', 'twitter');
+
+  var anvakaOut = graph.getOut('anvaka');
+  var anvakaIn = graph.getIn('anvaka');
+
+  t.equals(anvakaOut.length, 2, 'Two outgoing connections')
+  t.equals(anvakaIn.length, 0, 'no incoming nodes')
+
+  var githubIn = graph.getIn('github');
+  var githubOut = graph.getOut('github');
+
+  t.equals(githubOut.length, 0, 'no github out')
+  t.equals(githubIn.length, 1, 'one github in')
+
+  t.end();
+});
+
+test('it can iterate edges with data', function(t) {
+  var graph = createGraph();
+
+  graph.addLink('anvaka', 'github', { language: 'js' });
+  graph.addLink('anvaka', 'twitter', { language: 'birds' });
+
+  var calledCount = 0;
+  graph.forEachOut('anvaka', function(other, data) {
+    calledCount += 1;
+    var otherId = other.id;
+    if (otherId === 'github') {
+      t.equals(data.language, 'js', 'github data is here');
+    } else if (otherId === 'twitter') {
+      t.equals(data.language, 'birds', 'twitter data is here');
+    } else {
+      t.fail('Unknown other node: ' + otherId);
+    }
+  });
+
+  t.equals(calledCount, 2, 'All outgoing edges visited');
+
+  calledCount = 0;
+  graph.forEachIn('github', function(other, data) {
+    calledCount += 1;
+    var otherId = other.id;
+    if (otherId === 'anvaka') {
+      t.equals(data.language, 'js', 'github data is here');
+    } else {
+      t.fail('only one incoming link for github');
+    }
+  });
+
+  t.equals(calledCount, 1, 'All incoming edges visited');
+
+  t.end();
+})
+
 function collectGarbage() {
   if (global.gc) {
     global.gc();

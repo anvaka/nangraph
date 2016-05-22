@@ -84,7 +84,10 @@ class NanGraph : public Nan::ObjectWrap {
    * @param {string} toId - identifier of the edge end
    */
   static NAN_METHOD(GetLink);
+  static NAN_METHOD(ForEachOut);
+  static NAN_METHOD(ForEachIn);
   
+  void _forEachLinkedNode(Nan::NAN_METHOD_ARGS_TYPE info, bool isOut);
   void _saveData(std::size_t nodeId, const v8::Local<v8::Value>& arg);
   void _saveLinkData(std::size_t linkId, const v8::Local<v8::Value>& arg);
   bool _hasDataId(const JSDataStorage& storage, const std::size_t& id);

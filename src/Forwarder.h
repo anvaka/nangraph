@@ -18,7 +18,8 @@ struct Forwarder {
     _isolate = isolate;
   }
 
-  bool ForwardNodeResults(const std::size_t &nodeId, const Node *node);
+  bool ForwardNodeResults(const std::size_t &nodeId);
+  bool ForwardNodeAndLink(const std::size_t &nodeId, const std::size_t &linkId);
 
 //  void ForwardLinkedNode(NodeDef *node, LinkDef *link) {
 //    const unsigned argc = 2;

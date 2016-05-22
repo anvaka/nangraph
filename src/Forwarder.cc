@@ -1,6 +1,6 @@
 #include "Forwarder.h"
 
-bool Forwarder::ForwardNodeResults(const std::size_t &nodeId, const Node *node) {
+bool Forwarder::ForwardNodeResults(const std::size_t &nodeId) {
   const unsigned argc = 1;
   auto ctx = Nan::GetCurrentContext();
 
@@ -9,13 +9,33 @@ bool Forwarder::ForwardNodeResults(const std::size_t &nodeId, const Node *node) 
   };
   
   auto cbResult = Nan::MakeCallback(ctx->Global(), _cb, argc, argv);
-  
-  if (cbResult->IsTrue()) {
-    // JS Callback asks us to stop iteration imediately. Tell underlying visitor
-    // that we need to quit:
-    return true;
+
+  // We ask iterator to stop if client's callback returned true.
+  return cbResult->IsTrue();
+}
+
+bool Forwarder::ForwardNodeAndLink(const std::size_t &nodeId, const std::size_t &linkId) {
+  auto ctx = Nan::GetCurrentContext();
+
+  auto node = _graph->getJSNodeByInternalId(_isolate, nodeId);
+  v8::Local<v8::Value> cbResult;
+
+  if (_graph->_hasDataId(_graph->_linkData, linkId)) {
+    auto linkData = _graph->_linkData[linkId].Get(_isolate);
+    
+    v8::Local<v8::Value> argv[2] = {
+      node,
+      linkData
+    };
+    cbResult = Nan::MakeCallback(ctx->Global(), _cb, 2, argv);
+  } else {
+    v8::Local<v8::Value> argv[1] = {
+      _graph->getJSNodeByInternalId(_isolate, nodeId)
+    };
+    
+    cbResult = Nan::MakeCallback(ctx->Global(), _cb, 1, argv);
   }
-  
-  // no, continue iteration over remaining nodes.
-  return false;
+
+  // We ask iterator to stop if client's callback returned true.
+  return cbResult->IsTrue();
 }
