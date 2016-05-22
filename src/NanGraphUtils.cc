@@ -22,7 +22,7 @@ const std::size_t* IdManager::getHashPtrFromString(const std::string &stringId) 
   if (search == _memory.end()) {
     return nullptr;
   }
-  
+
   return &(search->first);
 }
 

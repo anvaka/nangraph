@@ -35,7 +35,7 @@ class NanGraph : public Nan::ObjectWrap {
    * Gets number of nodes in this graph.
    */
   static NAN_METHOD(GetNodesCount);
-  
+
   /**
    * Gets number of edges (links) in this graph.
    */
@@ -48,10 +48,10 @@ class NanGraph : public Nan::ObjectWrap {
    * @param {any} data - any contextual data associated with the node.
    */
   static NAN_METHOD(AddNode);
-  
+
   /**
    * Iterates over each node of a graph and invokes a callback.
-   * 
+   *
    * @param {Function} callback - a callback, which will receive node instance
    *  {id, data} as its argument.
    */
@@ -86,7 +86,7 @@ class NanGraph : public Nan::ObjectWrap {
   static NAN_METHOD(GetLink);
   static NAN_METHOD(ForEachOut);
   static NAN_METHOD(ForEachIn);
-  
+
   void _forEachLinkedNode(Nan::NAN_METHOD_ARGS_TYPE info, bool isOut);
   void _saveData(std::size_t nodeId, const v8::Local<v8::Value>& arg);
   void _saveLinkData(std::size_t linkId, const v8::Local<v8::Value>& arg);

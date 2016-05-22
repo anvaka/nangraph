@@ -32,7 +32,7 @@ NAN_MODULE_INIT(NanGraph::Init) {
   Nan::SetPrototypeMethod(tpl, "forEachNode", ForEachNode);
   Nan::SetPrototypeMethod(tpl, "forEachOut", ForEachOut);
   Nan::SetPrototypeMethod(tpl, "forEachIn", ForEachIn);
-  
+
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   Nan::Set(target, Nan::New("Graph").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
@@ -188,17 +188,17 @@ void NanGraph::_forEachLinkedNode(Nan::NAN_METHOD_ARGS_TYPE info, bool isOut) {
   auto nodeIdStr = v8toString(info[0]);
   auto nodeId = _idManager.getHashPtrFromString(nodeIdStr);
   if (nodeId == nullptr) return; // no such node
-  
+
   auto callback = info[1].As<v8::Function>();
-  
+
   Forwarder forwardNodeAndLink(this, info.GetIsolate(), callback);
-  
+
   auto visitor = std::bind(
                            &Forwarder::ForwardNodeAndLink,
                            &forwardNodeAndLink,
                            std::placeholders::_1,
                            std::placeholders::_2);
-  
+
   _graph->forEachLinkedNode(*nodeId, isOut, visitor);
 }
 

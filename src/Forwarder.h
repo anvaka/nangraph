@@ -20,29 +20,4 @@ struct Forwarder {
 
   bool ForwardNodeResults(const std::size_t &nodeId);
   bool ForwardNodeAndLink(const std::size_t &nodeId, const std::size_t &linkId);
-
-//  void ForwardLinkedNode(NodeDef *node, LinkDef *link) {
-//    const unsigned argc = 2;
-//
-//    v8::Local<v8::Value> argv[argc] = {
-//      Forwarder::wrapNodeDef(node),
-//      Forwarder::wrapLinkDef(link)
-//    };
-//
-//    Nan::MakeCallback(Nan::GetCurrentContext()->Global(), cb, argc, argv);
-//  }
-
-//  bool forward_link_result(LinkDef *result) {
-//    const unsigned argc = 1;
-//
-//    v8::Local<v8::Value> argv[argc] = { Forwarder::wrapLinkDef(result) };
-//    auto cbResult = Nan::MakeCallback(Nan::GetCurrentContext()->Global(), cb, argc, argv);
-//
-//    if (cbResult->IsBoolean()) {
-//       return cbResult->BooleanValue();
-//    }
-//
-//    return false; // no, don't stop the iteration
-//  }
-};
 #endif /* ifndef FORWARDER_H */

@@ -15,10 +15,10 @@ private:
   // As you see this brings us to the world of oriented graphs. I'm not sure
   // if I'm going to add non-oriented graphs yet.
   std::multiset<std::size_t> inNodes, outNodes;
-  
+
 public:
   Node() : inNodes(), outNodes() {}
-  
+
   friend class Graph;
 };
 
@@ -47,10 +47,10 @@ public:
 
   Node* addNode(const std::size_t& id);
   Node* getNode(const std::size_t& id);
-  
+
   std::size_t addLink(const std::size_t& fromId, const std::size_t &toId);
   std::size_t getLinkId(const std::size_t& fromId, const std::size_t &toId);
-  
+
   bool hasLink(const std::size_t& fromId, const std::size_t &toId);
   int getNodesCount() { return _nodes.size(); }
   int getLinksCount() { return _linksCount; }

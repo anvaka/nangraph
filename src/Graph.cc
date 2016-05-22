@@ -23,7 +23,7 @@ Node* Graph::getNode(const std::size_t& id) {
   if (iter == _nodes.end()) {
     return nullptr;
   }
-  
+
   return iter->second;
 }
 
@@ -32,14 +32,14 @@ bool Graph::forEachNode(NodeCallback callback) {
     auto shouldStop = callback(i.first);
     if (shouldStop) return true;
   }
-  
+
   return false;
 }
 
 bool Graph::forEachLinkedNode(const std::size_t nodeId, bool isOut, NodeLinkCallback callback) {
   auto node = getNode(nodeId);
   if (node == nullptr) return false; // we didn't quit because user wanted.
-  
+
   auto *collection = isOut ? &(node->outNodes) : &(node->inNodes);
 
   for(auto &otherNodeId: *collection) {
@@ -47,7 +47,7 @@ bool Graph::forEachLinkedNode(const std::size_t nodeId, bool isOut, NodeLinkCall
     auto shouldStop = callback(otherNodeId, linkId);
     if (shouldStop) return true; // user asked us to quit faster than we finished.
   }
-  
+
   return false; // nope, we iterated all. Not caused by user.
 }
 
@@ -58,7 +58,7 @@ std::size_t Graph::addLink(const std::size_t& fromId, const std::size_t &toId) {
   fromNode->outNodes.insert(toId);
   toNode->inNodes.insert(fromId);
   _linksCount += 1;
-  
+
   return getLinkId(fromId, toId);
 }
 
@@ -72,6 +72,6 @@ std::size_t Graph::getLinkId(const std::size_t& fromId, const std::size_t &toId)
 bool Graph::hasLink(const std::size_t& fromId, const std::size_t &toId) {
   auto fromNode = getNode(fromId);
   if (fromNode == nullptr) return false;
-  
+
   return fromNode->outNodes.find(toId) != fromNode->outNodes.end();
 }
