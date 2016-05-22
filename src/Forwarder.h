@@ -20,4 +20,5 @@ struct Forwarder {
 
   bool ForwardNodeResults(const std::size_t &nodeId);
   bool ForwardNodeAndLink(const std::size_t &nodeId, const std::size_t &linkId);
+};
 #endif /* ifndef FORWARDER_H */
