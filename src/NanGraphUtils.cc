@@ -12,11 +12,6 @@ IdManager::~IdManager() {}
 
 std::size_t IdManager::getAndRemember(const std::string& stringId) {
   auto id = _hasher(stringId);
-  auto search = _memory.find(id);
-  if (search != _memory.end()) {
-    std::cout << "Collision detected for: " << stringId << " hashed into " << id << std::endl
-    << "This has was also generated for: " << search->second << std::endl;
-  }
   _memory[id] = stringId;
   return id;
 }
