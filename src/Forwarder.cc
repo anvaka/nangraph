@@ -30,7 +30,7 @@ bool Forwarder::ForwardNodeAndLink(const std::size_t &nodeId, const std::size_t 
     cbResult = Nan::MakeCallback(ctx->Global(), _cb, 2, argv);
   } else {
     v8::Local<v8::Value> argv[1] = {
-      _graph->getJSNodeByInternalId(_isolate, nodeId)
+      node
     };
 
     cbResult = Nan::MakeCallback(ctx->Global(), _cb, 1, argv);

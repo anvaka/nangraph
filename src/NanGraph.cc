@@ -172,17 +172,20 @@ NAN_METHOD(NanGraph::ForEachNode) {
                            &forwardNode,
                            std::placeholders::_1);
 
-  self->_graph->forEachNode(visitor);
+  auto quitFast = self->_graph->forEachNode(visitor);
+  info.GetReturnValue().Set(quitFast);
 }
 
 NAN_METHOD(NanGraph::ForEachOut) {
   NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
-  self->_forEachLinkedNode(info, true);
+  auto quitFast = self->_forEachLinkedNode(info, true);
+  info.GetReturnValue().Set(quitFast);
 }
 
 NAN_METHOD(NanGraph::ForEachIn) {
   NanGraph* self = ObjectWrap::Unwrap<NanGraph>(info.This());
-  self->_forEachLinkedNode(info, false);
+  auto quitFast = self->_forEachLinkedNode(info, false);
+  info.GetReturnValue().Set(quitFast);
 }
 
 NAN_METHOD(NanGraph::ForEachLink) {
@@ -197,13 +200,14 @@ NAN_METHOD(NanGraph::ForEachLink) {
                            std::placeholders::_2,
                            std::placeholders::_3);
   
-  self->_graph->forEachLink(visitor);
+  auto quitFast = self->_graph->forEachLink(visitor);
+  info.GetReturnValue().Set(quitFast);
 }
 
-void NanGraph::_forEachLinkedNode(Nan::NAN_METHOD_ARGS_TYPE info, bool isOut) {
+bool NanGraph::_forEachLinkedNode(Nan::NAN_METHOD_ARGS_TYPE info, bool isOut) {
   auto nodeIdStr = v8toString(info[0]);
   auto nodeId = _idManager.getHashPtrFromString(nodeIdStr);
-  if (nodeId == nullptr) return; // no such node
+  if (nodeId == nullptr) return false; // no such node
 
   auto callback = info[1].As<v8::Function>();
 
@@ -215,7 +219,7 @@ void NanGraph::_forEachLinkedNode(Nan::NAN_METHOD_ARGS_TYPE info, bool isOut) {
                            std::placeholders::_1,
                            std::placeholders::_2);
 
-  _graph->forEachLinkedNode(*nodeId, isOut, visitor);
+  return _graph->forEachLinkedNode(*nodeId, isOut, visitor);
 }
 
 void NanGraph::_saveLinkData(std::size_t linkId, const v8::Local<v8::Value>& arg) {

@@ -24,7 +24,10 @@ function createGraph() {
     forEachOut: forEachOut,
     forEachIn: forEachIn,
     getIn: getIn,
-    getOut: getOut
+    getOut: getOut,
+
+    // ngraph.graph compatibility interface
+    forEachLinkedNode: forEachLinkedNode
   };
 
   return api;
@@ -56,6 +59,33 @@ function createGraph() {
     if (toId === undefined) throw new Error('toId is not set');
 
     return graph.addLink(fromId, toId, data);
+  }
+
+  function forEachLinkedNode(nodeId, cb, isOriented) {
+    if (typeof cb !== 'function') throw new Error('Callback is expected to be a function');
+
+    var quitFast = graph.forEachOut(nodeId, function(to, data) {
+      var cbData = {
+        fromId: nodeId,
+        toId: to.id
+      };
+      if (data) cbData.data = data;
+      return cb(to, cbData);
+    });
+
+    if (isOriented) return quitFast; // when this is passed to ngraph, it never visited incoming links
+    if (quitFast) return quitFast; // quitFast means that cb wanted to quit fast
+
+    return graph.forEachIn(nodeId, function(from, data) {
+      if (from.id === nodeId) return; // this was handled before.
+
+      var cbData = {
+        fromId: from.id,
+        toId: nodeId
+      };
+      if (data) cbData.data = data;
+      return cb(from, cbData);
+    });
   }
 
   function forEachNode(cb) {
