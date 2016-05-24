@@ -23,11 +23,13 @@ function createGraph() {
 
     forEachOut: forEachOut,
     forEachIn: forEachIn,
+
     getIn: getIn,
     getOut: getOut,
 
     // ngraph.graph compatibility interface
-    forEachLinkedNode: forEachLinkedNode
+    forEachLinkedNode: forEachLinkedNode,
+    getLinks: getLinks,
   };
 
   return api;
@@ -110,6 +112,15 @@ function createGraph() {
     if (typeof cb !== 'function') throw new Error('Callback is expected to be a function');
 
     graph.forEachIn(nodeId, cb);
+  }
+
+  function getLinks(nodeId) {
+    var links = [];
+    forEachLinkedNode(nodeId, function(_, link) {
+      links.push(link);
+    });
+
+    return links;
   }
 
   function getOut(nodeId) {

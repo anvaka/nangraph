@@ -208,6 +208,53 @@ test('it can iterate over all edges', function(t) {
   t.end();
 });
 
+test('it throw if no node id is passed', function(t) {
+  var graph = createGraph();
+  t.throws(function() {
+    graph.addNode(); // no id, should throw
+  }, 'It throws on undefined node');
+
+  t.end();
+});
+
+test('it can add node with id similar to reserved prototype property', function(t) {
+  var graph = createGraph();
+  graph.addNode('constructor');
+  graph.addLink('watch', 'constructor');
+
+  var iterated = 0;
+  graph.forEachNode(function() {
+    iterated += 1;
+  });
+
+  t.ok(graph.hasLink('watch', 'constructor'));
+  t.equals(graph.getLinksCount(), 1, 'one link');
+  t.equal(iterated, 2, 'has two nodes');
+  t.end();
+});
+
+test('hasLink is the same as getLink', function (t) {
+  var graph = createGraph();
+
+  t.equals(graph.getLink, graph.hasLink, 'hasLink is synonim for getLink');
+  t.end();
+});
+
+test('add link adds link', function(t) {
+  var graph = createGraph();
+
+  var link = graph.addLink('1', '2'),
+    firstNodeLinks = graph.getLinks('1'),
+    secondNodeLinks = graph.getLinks('2');
+
+  t.equal(graph.getNodesCount(), 2, 'Two nodes');
+  t.equal(graph.getLinksCount(), 1, 'One link');
+  t.equal(firstNodeLinks.length, 1, 'number of links of the first node is wrong');
+  t.equal(secondNodeLinks.length, 1, 'number of links of the second node is wrong');
+  t.equal(link, firstNodeLinks[0], 'invalid link in the first node');
+  t.equal(link, secondNodeLinks[0], 'invalid link in the second node');
+  t.end();
+});
 
 function collectGarbage() {
   if (global.gc) {
