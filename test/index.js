@@ -251,8 +251,6 @@ test('add link adds link', function(t) {
   t.equal(graph.getLinksCount(), 1, 'One link');
   t.equal(firstNodeLinks.length, 1, 'number of links of the first node is wrong');
   t.equal(secondNodeLinks.length, 1, 'number of links of the second node is wrong');
-  t.equal(link, firstNodeLinks[0], 'invalid link in the first node');
-  t.equal(link, secondNodeLinks[0], 'invalid link in the second node');
   t.end();
 });
 
