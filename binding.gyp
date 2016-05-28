@@ -17,7 +17,7 @@
       "dependencies": [
         "<!(node -e \"console.log(require.resolve('nangraph.cpp/gyp/package.gyp') + ':nangraph')\")"
       ],
-      "cflags" : [ "-std=c++14", "-stdlib=libc++" ],
+      "cflags" : [ "-std=c++11", "-stdlib=libc++" ],
       "conditions": [
           [ 'OS!="win"', {
             "cflags+": [ "-std=c++14" ],
@@ -26,7 +26,7 @@
           }],
           [ 'OS=="mac"', {
             "xcode_settings": {
-              "OTHER_CPLUSPLUSFLAGS" : [ "-std=c++14", "-stdlib=libc++" ],
+              "OTHER_CPLUSPLUSFLAGS" : [ "-std=c++11", "-stdlib=libc++" ],
               "OTHER_LDFLAGS": [ "-stdlib=libc++" ],
               "MACOSX_DEPLOYMENT_TARGET": "10.7"
             },

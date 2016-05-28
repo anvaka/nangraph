@@ -1,7 +1,7 @@
 #include "NanGraph.h"
 
 NanGraph::NanGraph() {
-  _graph = std::make_unique<Graph>();
+  _graph = std::unique_ptr<Graph>( new Graph() );
 };
 
 NanGraph::~NanGraph() {
