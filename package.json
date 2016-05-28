@@ -22,10 +22,11 @@
   },
   "devDependencies": {
     "nan": "^2.3.3",
-    "node-gyp": "^3.3.1",
+    "ngyp": "^1.0.1",
     "tap": "^5.7.1"
   },
   "dependencies": {
-    "bindings": "^1.2.1"
+    "bindings": "^1.2.1",
+    "nangraph.cpp": "^1.0.2"
   }
 }

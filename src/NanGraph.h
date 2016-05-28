@@ -2,7 +2,7 @@
 #define NAN_GRAPH_H
 
 #include <nan.h>
-#include "Graph.h"
+#include "nangraph/graph.h"
 #include "NanGraphUtils.h"
 #include "Forwarder.h"
 

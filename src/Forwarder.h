@@ -3,7 +3,7 @@
 
 #include <nan.h>
 #include "v8.h"
-#include "Graph.h"
+#include "nangraph/graph.h"
 #include "NanGraph.h"
 
 class NanGraph;

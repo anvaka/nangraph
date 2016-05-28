@@ -8,13 +8,14 @@
         "src/NanGraph.h",
         "src/NanGraphUtils.cc",
         "src/NanGraphUtils.h",
-        "src/Graph.cc",
-        "src/Graph.h",
         "src/Forwarder.cc",
         "src/Forwarder.h",
       ],
       "include_dirs": [
         "<!(node -e \"require('nan')\")"
+      ],
+      "dependencies": [
+        "<!(node -e \"console.log(require.resolve('nangraph.cpp/gyp/package.gyp') + ':nangraph')\")"
       ],
       "cflags" : [ "-std=c++14", "-stdlib=libc++" ],
       "conditions": [
