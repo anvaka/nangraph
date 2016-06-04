@@ -2,7 +2,7 @@
 #define NAN_GRAPH_H
 
 #include <nan.h>
-#include "nangraph/graph.h"
+#include "nangraph.cc/graph.h"
 #include "NanGraphUtils.h"
 #include "Forwarder.h"
 
@@ -16,6 +16,7 @@ class NanGraph : public Nan::ObjectWrap {
 
  public:
   static NAN_MODULE_INIT(Init);
+  Graph *getGraph() { return _graph.get(); }
 
  private:
   std::unique_ptr<Graph> _graph;

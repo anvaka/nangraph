@@ -15,8 +15,13 @@
         "<!(node -e \"require('nan')\")"
       ],
       "dependencies": [
-        "<!(node -e \"console.log(require.resolve('nangraph.cpp/gyp/nangraph.cc.gyp') + ':nangraph')\")"
+        "<!(node -e \"console.log(require.resolve('nangraph.cc/gyp/nangraph.cc.gyp') + ':nangraph')\")"
       ],
+      'all_dependent_settings': {
+        'include_dirs': [
+          './src'
+        ],
+      },
       "cflags" : [ "-std=c++11" ],
       "conditions": [
           [ 'OS!="win"', {

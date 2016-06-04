@@ -30,9 +30,14 @@ function createGraph() {
     // ngraph.graph compatibility interface
     forEachLinkedNode: forEachLinkedNode,
     getLinks: getLinks,
+    getNativeGraph: getNativeGraph
   };
 
   return api;
+
+  function getNativeGraph() {
+    return graph;
+  }
 
   function addNode(id, data) {
     if (id === undefined) throw new Error('Node id cannot be undefined');

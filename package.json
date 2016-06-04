@@ -27,6 +27,6 @@
   },
   "dependencies": {
     "bindings": "^1.2.1",
-    "nangraph.cpp": "^2.0.0"
+    "nangraph.cc": "^3.0.0"
   }
 }
