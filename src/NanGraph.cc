@@ -204,6 +204,11 @@ NAN_METHOD(NanGraph::ForEachLink) {
   info.GetReturnValue().Set(quitFast);
 }
 
+const std::size_t *NanGraph::getNodeId(const v8::Local<v8::Value>& arg) {
+  auto nodeIdStr = v8toString(arg);
+  return _idManager.getHashPtrFromString(nodeIdStr);
+}
+
 bool NanGraph::_forEachLinkedNode(Nan::NAN_METHOD_ARGS_TYPE info, bool isOut) {
   auto nodeIdStr = v8toString(info[0]);
   auto nodeId = _idManager.getHashPtrFromString(nodeIdStr);

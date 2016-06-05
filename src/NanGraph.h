@@ -17,6 +17,7 @@ class NanGraph : public Nan::ObjectWrap {
  public:
   static NAN_MODULE_INIT(Init);
   Graph *getGraph() { return _graph.get(); }
+  const std::size_t *getNodeId(const v8::Local<v8::Value>& arg);
 
  private:
   std::unique_ptr<Graph> _graph;
