@@ -1,6 +1,6 @@
 {
   "name": "nangraph",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Experimental graph library with native C++ bindings",
   "main": "index.js",
   "scripts": {
